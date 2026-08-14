@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mismatch Map</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #FFF1CA;
+    --paper: #FBF8EF;
+    --panel-2: #E4DCC3;
+    --line: #C9BE9D;
+    --ink: #2C2A1E;
+    --muted: #6B664F;
+    --forest: #2F5233;
+    --forest-dark: #223D27;
+    --leaf: #6B9E4A;
+    --clay: #B5651D;
+    --gold: #C68A1F;
+    --rose: #B04A3A;
+    --sky: #3E7C8C;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
+  body.story-mode { overflow: hidden; }
+
+  /* Story frames */
+  .story-container {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .story-frame {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 40px 80px;
+  }
+
+  .story-text {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 600px;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Content section */
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 72px 24px 120px;
+    background: rgba(239, 233, 216, 0.9);
+  }
+
+  .wrap > div {
+    padding-top: 8px;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    color: var(--forest-dark);
+  }
+
+  h1 { font-size: 2.3rem; line-height: 1.12; }
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.15rem; }
+
+  p {
+    line-height: 1.65;
+    color: var(--ink);
+    margin: 0 0 16px;
+    font-size: 1.02rem;
+  }
+
+  .muted { color: var(--muted); font-size: 0.92rem; }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    color: var(--clay);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: rgba(251, 248, 239, 0.94);
+    border: 1.5px solid var(--line);
+    border-radius: 18px 20px 16px 22px;
+    padding: 28px;
+    margin: 22px 0;
+    box-shadow: 3px 4px 0 rgba(44, 42, 30, 0.06);
+    border-left: 3px solid rgba(181, 101, 29, 0.25);
+  }
+
+  .fade-in { animation: fadeIn 0.6s ease both; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn {
+    display: inline-block;
+    background: var(--forest);
+    color: #FBF8EF;
+    border: none;
+    border-radius: 999px;
+    padding: 13px 26px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px) rotate(-0.3deg); box-shadow: 0 6px 18px rgba(47, 82, 51, 0.3); }
+  .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+  .btn.secondary {
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+  }
+
+  .btn.secondary:hover { border-color: var(--forest); box-shadow: none; }
+
+  .choice-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  @media(min-width: 600px) { .choice-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+  .choice-btn {
+    background: rgba(251, 248, 239, 0.96);
+    border: 1.5px solid var(--line);
+    border-radius: 18px 20px 16px 22px;
+    padding: 20px 16px;
+    text-align: left;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s ease;
+    box-shadow: 3px 4px 0 rgba(44, 42, 30, 0.04);
+  }
+
+  .choice-btn:hover { border-color: rgba(107, 158, 74, 0.8); background: #F3EEDD; transform: translateY(-1px); }
+
+  .choice-btn .icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
+  .choice-btn .label { font-weight: 600; font-size: 0.98rem; color: var(--forest-dark); }
+
+  select {
+    background: rgba(251, 248, 239, 0.96);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    border-radius: 12px 14px 10px 16px;
+    padding: 11px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    width: 100%;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  label { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 500; }
+
+  .slider-row { margin-bottom: 22px; }
+
+  .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .opt-btn {
+    background: rgba(228, 220, 195, 0.9);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    padding: 9px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .opt-btn:hover { border-color: rgba(107, 158, 74, 0.8); color: var(--ink); }
+  .opt-btn.active { background: var(--leaf); color: #FBF8EF; border-color: var(--leaf); font-weight: 600; box-shadow: 0 6px 16px rgba(107, 158, 74, 0.18); }
+  .opt-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .stat-row { display: flex; gap: 24px; margin: 24px 0; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 160px; }
+  .stat .num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.8rem; color: var(--clay); line-height: 1; font-style: italic; }
+  .stat .lbl { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+  .bar-bg { background: var(--panel-2); border-radius: 6px; height: 10px; overflow: hidden; margin-top: 8px; }
+  .bar-fill { background: var(--clay); height: 100%; border-radius: 6px; transition: width 1s ease; }
+
+  svg text { font-family: 'Inter', sans-serif; }
+
+  .dot { cursor: pointer; transition: r 0.15s ease, opacity 0.2s ease; }
+  .dot:hover { filter: brightness(0.85); }
+
+  .tooltip {
+    position: absolute;
+    background: var(--forest-dark);
+    color: #FBF8EF;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .result-card { border-left: 3px solid var(--clay); padding-left: 18px; margin-top: 18px; }
+  .result-card.fix { border-left-color: var(--leaf); }
+
+  .back-link {
+    color: var(--muted);
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .back-link:hover { color: var(--forest-dark); }
+
+  .divider { height: 1px; background: var(--line); margin: 40px 0; }
+
+  .match-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+
+  .match-item {
+    background: rgba(228, 220, 195, 0.7);
+    border: 1.5px solid var(--line);
+    border-radius: 14px 16px 12px 18px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 2px 3px 0 rgba(44, 42, 30, 0.04);
+  }
+
+  .match-item .name { font-weight: 600; color: var(--forest-dark); }
+  .match-item .type { color: var(--muted); font-size: 0.82rem; }
+
+  @media(prefers-reduced-motion: reduce) { .fade-in, .bar-fill, .dot { animation: none!important; transition: none!important; } }
+
+  .nav-btn {
+    background: rgba(47, 82, 51, 0.7);
+    color: #FBF8EF;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  .nav-btn:hover:not(:disabled) { 
+    background: rgba(47, 82, 51, 0.9);
+    transform: scale(1.1);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="story-container">
+  <div class="story-frame" style="background-image: url('MacBook Air - 5.jpg');">
+    <div style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+      <div style="display: flex; gap: 16px;">
+        <button class="nav-btn" onclick="nextFrame(-1)" style="opacity: 0.3; cursor: not-allowed;" disabled>←</button>
+        <button class="nav-btn" onclick="nextFrame(1)">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-frame" style="background-image: url('MacBook Air - 6.jpg'); display: none;" id="frame1">
+    <div style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+      <div class="story-text">Komal got a plant on her birthday. It was her first plant ever, a bougainvillea.</div>
+      <div style="display: flex; gap: 16px;">
+        <button class="nav-btn" onclick="nextFrame(0)">←</button>
+        <button class="nav-btn" onclick="nextFrame(2)">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-frame" style="background-image: url('MacBook Air - 7.jpg'); display: none;" id="frame2">
+    <div style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+      <div class="story-text">She kept it in her room and watered it every day. She was happy taking care of it.</div>
+      <div style="display: flex; gap: 16px;">
+        <button class="nav-btn" onclick="nextFrame(1)">←</button>
+        <button class="nav-btn" onclick="nextFrame(3)">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="story-frame" style="background-image: url('MacBook Air - 8.jpg'); display: none;" id="frame3">
+    <div style="display: flex; flex-direction: column; gap: 24px; align-items: center;">
+      <div class="story-text">After two months, the plant died.</div>
+      <div style="display: flex; gap: 16px;">
+        <button class="nav-btn" onclick="nextFrame(2)">←</button>
+        <button class="nav-btn" onclick="nextFrame(4)">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<script>
+// ---------- FRAME NAVIGATION ----------
+let currentFrame = 0;
+
+function setStoryMode(isStory){
+  document.body.classList.toggle('story-mode', isStory);
+  document.documentElement.style.overflow = isStory ? 'hidden' : 'auto';
+  document.body.style.overflow = isStory ? 'hidden' : 'auto';
+}
+
+function nextFrame(frameNum){
+  const frames = document.querySelectorAll('.story-frame');
+  
+  // Hide all frames
+  frames.forEach((f) => {
+    f.style.display = 'none';
+  });
+
+  // Show the requested frame
+  if(frameNum >= 0 && frameNum < frames.length){
+    currentFrame = frameNum;
+    setStoryMode(true);
+    frames[frameNum].style.display = 'flex';
+  } else if(frameNum >= frames.length){
+    setStoryMode(false);
+    go(screenStat);
+  }
+}
+
+const DATA = {"plants": [{"name": "Money Plant (Pothos)", "botanical": "Epipremnum aureum", "type": "Foliage / Creeper", "lightRaw": "Low to bright indirect", "waterRaw": "Every 7-10 days (top 1-2 in dry)", "lightScore": 2, "waterScore": 2, "humidity": "Average, tolerates dry air", "feeding": "Monthly, growing season, half-strength", "difficulty": "Easy", "petSafe": "No - toxic (oxalates)", "growthHabit": "Trailing / climbing"}, {"name": "Snake Plant", "botanical": "Sansevieria trifasciata", "type": "Foliage / Succulent-like", "lightRaw": "Low to bright indirect", "waterRaw": "Every 2-3 weeks, let dry fully", "lightScore": 2, "waterScore": 4, "humidity": "Low, very tolerant", "feeding": "2x/year is enough", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright, sword-like"}, {"name": "ZZ Plant", "botanical": "Zamioculcas zamiifolia", "type": "Foliage", "lightRaw": "Low to bright indirect", "waterRaw": "Every 2-3 weeks, let dry fully", "lightScore": 2, "waterScore": 4, "humidity": "Low, tolerant of dry air", "feeding": "Monthly in growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright"}, {"name": "Spider Plant", "botanical": "Chlorophytum comosum", "type": "Foliage", "lightRaw": "Medium to bright indirect", "waterRaw": "Weekly (top inch dry)", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Trailing / arching"}, {"name": "Peace Lily", "botanical": "Spathiphyllum spp.", "type": "Flowering", "lightRaw": "Low to medium indirect", "waterRaw": "Weekly (top inch dry); droops when thirsty", "lightScore": 2, "waterScore": 2, "humidity": "High, likes humidity", "feeding": "Every 6-8 weeks", "difficulty": "Easy-Moderate", "petSafe": "No - toxic to pets", "growthHabit": "Upright, clumping"}, {"name": "Aglaonema (Chinese Evergreen)", "botanical": "Aglaonema commutatum", "type": "Foliage", "lightRaw": "Indirect Light", "waterRaw": "Once a Week", "lightScore": 2, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright"}, {"name": "Dracaena", "botanical": "Dracaena spp.", "type": "Foliage", "lightRaw": "Indirect Light", "waterRaw": "Once a Week", "lightScore": 2, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright cane"}, {"name": "Rubber Plant", "botanical": "Ficus elastica", "type": "Foliage", "lightRaw": "Bright but Indirect", "waterRaw": "Once a Week", "lightScore": 3, "waterScore": 2, "humidity": "Moderate-high", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic (latex sap)", "growthHabit": "Upright tree-form"}, {"name": "Philodendron (Heartleaf)", "botanical": "Philodendron hederaceum", "type": "Foliage / Creeper", "lightRaw": "Bright but Indirect", "waterRaw": "Once a Week", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Trailing / climbing"}, {"name": "Calathea", "botanical": "Calathea spp.", "type": "Foliage", "lightRaw": "Indirect Light", "waterRaw": "Once a Week", "lightScore": 2, "waterScore": 2, "humidity": "High (60-80%)", "feeding": "Monthly, growing season", "difficulty": "Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Upright, clumping"}], "komalOverlay": {"ideal": {"lightScore": 4, "waterScore": 4}, "actual": {"lightScore": 1, "waterScore": 1}}, "symptoms": {}};
+
+const app = document.getElementById('app');
+
+// ---------- MAP GEOMETRY ----------
+const PAD = 54, W = 640, H = 460;
+const plotW = W - PAD*2, plotH = H - PAD*2;
+function sx(light){ return PAD + (light-0.5)/4 * plotW; }
+function sy(water){ return PAD + (water-0.5)/4 * plotH; }
+
+const lightLabels = {1:'Low light',2:'Medium indirect',3:'Bright indirect',4:'Full sun'};
+const waterLabels = {1:'Waters often',2:'Weekly',3:'Every 1-2 wks',4:'Rarely'};
+
+function dist(user, plant){
+  return Math.sqrt(Math.pow(user.light-plant.lightScore,2) + Math.pow(user.water-plant.waterScore,2));
+}
+
+// ---------- MAP RENDERER ----------
+function renderMapSVG(opts={}){
+  const plants = DATA.plants;
+  let dots = '';
+  let labels = '';
+  let topFour = [];
+
+  if(opts.userPoint){
+    topFour = plants.map(p=>({...p, d: dist(opts.userPoint,p)})).sort((a,b)=>a.d-b.d).slice(0,4);
+  }
+  const topNames = new Set(topFour.map(p=>p.name));
+
+  plants.forEach(p=>{
+    const cx = sx(p.lightScore), cy = sy(p.waterScore);
+    let r = 6, fill = '#9C9268', opacity = 0.6;
+
+    if(opts.highlightName && p.name === opts.highlightName){
+      r = 10; fill = '#2F5233'; opacity = 1;
+    } else if(opts.highlightName){
+      opacity = 0.2;
+    }
+
+    if(opts.userPoint){
+      if(topNames.has(p.name)){
+        r = 10; fill = '#6B9E4A'; opacity = 1;
+      } else {
+        r = 4; fill = '#C9BE9D'; opacity = 0.5;
+      }
+    }
+
+    dots += `<circle class="dot" data-name="${p.name.replace(/"/g,'&quot;')}" cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" opacity="${opacity}" stroke="#FBF8EF" stroke-width="1.5"></circle>`;
+  });
+
+  if(opts.userPoint){
+    topFour.forEach((p,i)=>{
+      const cx = sx(p.lightScore), cy = sy(p.waterScore);
+      labels += `<circle cx="${cx}" cy="${cy-19}" r="9" fill="#C68A1F"/>
+        <text x="${cx}" y="${cy-15}" fill="#FBF8EF" font-size="11" text-anchor="middle" font-weight="700">${i+1}</text>`;
+    });
+  }
+
+  let komalLayer = '';
+  if(opts.komal){
+    const ideal = DATA.komalOverlay.ideal, actual = DATA.komalOverlay.actual;
+    const ix = sx(ideal.lightScore), iy = sy(ideal.waterScore);
+    const ax = sx(actual.lightScore), ay = sy(actual.waterScore);
+    komalLayer = `
+      <line x1="${ax}" y1="${ay}" x2="${ix}" y2="${iy}" stroke="#B04A3A" stroke-width="2.5" stroke-dasharray="6,5" marker-end="url(#arrow)"/>
+      <circle cx="${ax}" cy="${ay}" r="10" fill="#B04A3A" stroke="#FBF8EF" stroke-width="2"/>
+      <circle cx="${ix}" cy="${iy}" r="10" fill="#6B9E4A" stroke="#FBF8EF" stroke-width="2"/>
+      <text x="${ax}" y="${ay+26}" fill="#B04A3A" font-size="12" text-anchor="middle" font-weight="600">What Komal gave it</text>
+      <text x="${ix}" y="${iy-16}" fill="#3F6B2C" font-size="12" text-anchor="middle" font-weight="600">What it needed</text>
+    `;
+  }
+
+  let userLayer = '';
+  if(opts.userPoint){
+    const ux = sx(opts.userPoint.light), uy = sy(opts.userPoint.water);
+    let userText = `<text x="${ux}" y="${uy-18}" fill="#3E7C8C" font-size="12" text-anchor="middle" font-weight="600">You</text>`;
+    userLayer = `<path d="M${ux} ${uy-11} L${ux+11} ${uy} L${ux} ${uy+11} L${ux-11} ${uy} Z" fill="#3E7C8C" stroke="#FBF8EF" stroke-width="1.5"/>` + userText;
+  }
+
+  return `
+  <div style="position:relative;">
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:#FBF8EF;border-radius:14px;border:1.5px solid #C9BE9D;">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#B04A3A"/>
+        </marker>
+      </defs>
+      <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="#C9BE9D"/>
+      <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="#C9BE9D"/>
+      ${[1,2,3,4].map(v=>`<text x="${sx(v)}" y="${H-PAD+20}" fill="#6B664F" font-size="11" text-anchor="middle">${lightLabels[v]}</text>`).join('')}
+      ${[1,2,3,4].map(v=>`<text x="${PAD-8}" y="${sy(v)+4}" fill="#6B664F" font-size="11" text-anchor="end">${waterLabels[v]}</text>`).join('')}
+      <text x="${W/2}" y="${H-8}" fill="#B5651D" font-size="12" text-anchor="middle" font-weight="600">LIGHT NEEDED →</text>
+      <text x="14" y="${H/2}" fill="#B5651D" font-size="12" text-anchor="middle" font-weight="600" transform="rotate(-90 14 ${H/2})">WATERING NEED →</text>
+      ${dots}
+      ${labels}
+      ${komalLayer}
+      ${userLayer}
+    </svg>
+    <div id="tooltip" style="display:none;position:absolute;"></div>
+  </div>`;
+}
+
+function attachMapEvents(container){
+  const svg = container.querySelector('svg');
+  const tooltip = container.querySelector('#tooltip');
+  container.querySelectorAll('.dot').forEach(dot=>{
+    dot.addEventListener('mousemove', (e)=>{
+      const rect = container.getBoundingClientRect();
+      tooltip.style.display = 'block';
+      tooltip.className = 'tooltip';
+      tooltip.style.left = (e.clientX - rect.left + 14) + 'px';
+      tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+      tooltip.textContent = dot.getAttribute('data-name');
+    });
+    dot.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+  });
+}
+
+// ---------- SCREENS ----------
+function go(renderFn){
+  setStoryMode(false);
+  app.innerHTML = '';
+  const el = document.createElement('div');
+  el.className = 'fade-in';
+  app.appendChild(el);
+  renderFn(el);
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+function screenStat(el){
+  el.innerHTML = `
+    <div class="eyebrow">She's not alone</div>
+    <h2>This happens to almost everyone</h2>
+    <p class="muted">From a 2022 survey of 1,250 young plant owners (Trees.com / Pollfish):</p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num">69%</div>
+        <div class="lbl">of plant owners aged 18-24 have had at least one houseplant die on them</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:0%" id="bar1"></div></div>
+      </div>
+      <div class="stat">
+        <div class="num">1 in 10</div>
+        <div class="lbl">have lost ten or more plants</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:0%" id="bar2"></div></div>
+      </div>
+    </div>
+    <p>So Komal didn't do anything careless. She just didn't know what her specific plant actually needed — and there was no easy way to find out.</p>
+    <button class="btn" id="next">See what actually went wrong →</button>
+  `;
+  requestAnimationFrame(()=>{
+    document.getElementById('bar1').style.width = '69%';
+    document.getElementById('bar2').style.width = '10%';
+  });
+  el.querySelector('#next').onclick = ()=> go(screenMapReveal);
+}
+
+function screenMapReveal(el){
+  el.innerHTML = `
+    <div class="eyebrow">The Mismatch Map</div>
+    <h2>Every plant needs a certain amount of light and water</h2>
+    <p>Here are 44 common beginner plants, placed by what they actually need — how much light, and how often they want water. Plants that love full sun and barely any water sit in one corner. Plants that are happy in shade but thirsty often sit in another.</p>
+    <div class="card">${renderMapSVG({komal:true})}</div>
+    <p>A bougainvillea sits far on the "full sun, water rarely" side. But Komal kept hers in a low-light room and watered it daily — the opposite corner of the map.</p>
+    <p><strong>That gap between the two points is why it died.</strong> Not carelessness — a mismatch.</p>
+    <button class="btn" id="next">What about your plant? →</button>
+  `;
+  attachMapEvents(el.querySelector('.card'));
+  el.querySelector('#next').onclick = ()=> go(screenAsk);
+}
+
+function screenAsk(el){
+  el.innerHTML = `
+    <div class="eyebrow">Your turn</div>
+    <h2>What about you?</h2>
+    <p>Pick whichever fits where you are right now.</p>
+    <div class="choice-grid">
+      <button class="choice-btn" id="c1"><span class="icon">🌱</span><span class="label">My plant is struggling</span><div class="muted" style="margin-top:6px;">Something looks off, but it's still alive</div></button>
+      <button class="choice-btn" id="c2"><span class="icon">🥀</span><span class="label">My plant already died</span><div class="muted" style="margin-top:6px;">Let's understand why, for next time</div></button>
+      <button class="choice-btn" id="c3"><span class="icon">🪴</span><span class="label">I want a new plant</span><div class="muted" style="margin-top:6px;">Let's find one that'll actually fit you</div></button>
+    </div>
+  `;
+  el.querySelector('#c1').onclick = ()=> go((e)=>screenDiagnose(e,'struggling'));
+  el.querySelector('#c2').onclick = ()=> go((e)=>screenDiagnose(e,'died'));
+  el.querySelector('#c3').onclick = ()=> go(screenNewPlant);
+}
+
+function screenDiagnose(el, mode){
+  const isDead = mode === 'died';
+  const plantNames = DATA.plants.map(p=>p.name).sort();
+  el.innerHTML = `
+    <button class="back-link" id="back">← back</button>
+    <div class="eyebrow">${isDead ? "Let's find out what happened" : "Let's fix this"}</div>
+    <h2>${isDead ? "Which plant did you lose?" : "Which plant is struggling?"}</h2>
+    <label>Plant</label>
+    <select id="plantSelect">
+      <option value="">Choose a plant…</option>
+      ${plantNames.map(n=>`<option value="${n}">${n}</option>`).join('')}
+    </select>
+    <div id="symptomWrap" style="display:none;">
+      <label>What are you seeing${isDead ? ' (before it died)':''}?</label>
+      <select id="symptomSelect"></select>
+    </div>
+    <div id="mapHolder"></div>
+    <div id="resultWrap"></div>
+  `;
+  el.querySelector('#back').onclick = ()=> go(screenAsk);
+
+  const plantSelect = el.querySelector('#plantSelect');
+  const symptomWrap = el.querySelector('#symptomWrap');
+  const symptomSelect = el.querySelector('#symptomSelect');
+  const mapHolder = el.querySelector('#mapHolder');
+  const resultWrap = el.querySelector('#resultWrap');
+
+  plantSelect.onchange = ()=>{
+    const name = plantSelect.value;
+    resultWrap.innerHTML = '';
+    if(!name){ symptomWrap.style.display='none'; mapHolder.innerHTML=''; return; }
+
+    mapHolder.innerHTML = `<div class="card">${renderMapSVG({highlightName:name})}</div>`;
+    attachMapEvents(mapHolder.querySelector('.card'));
+
+    let syms = DATA.symptoms[name];
+    let generic = false;
+    if(!syms){
+      generic = true;
+      syms = [
+        {symptom:'Yellow leaves, soil feels damp', cause:'Overwatering / root rot risk', fix:'Let soil dry out fully before watering again; check the pot drains well'},
+        {symptom:'Brown, crispy leaf edges', cause:'Underwatering or low humidity', fix:'Water more consistently, or raise humidity around the plant'},
+        {symptom:'Leggy growth, stretching to one side', cause:'Insufficient light', fix:'Move to a brighter spot and rotate the pot occasionally'},
+        {symptom:'Sudden leaf drop', cause:'Shock from repotting, cold drafts, or a big change in environment', fix:'Keep conditions stable; avoid moving it right after repotting'}
+      ];
+    }
+    symptomWrap.style.display = 'block';
+    symptomSelect.innerHTML = `<option value="">Choose a symptom…</option>` +
+      syms.map((s,i)=>`<option value="${i}">${s.symptom}</option>`).join('');
+
+    symptomSelect.onchange = ()=>{
+      const idx = symptomSelect.value;
+      if(idx===''){ resultWrap.innerHTML=''; return; }
+      const s = syms[idx];
+      const p = DATA.plants.find(p=>p.name===name);
+      resultWrap.innerHTML = `
+        <div class="card">
+          <div class="result-card">
+            <h3>${isDead ? "What likely happened" : "What's likely going on"}</h3>
+            <p>${s.cause}${generic ? ' <span class="muted">(general guidance — this plant\u2019s specific symptoms were not individually verified)</span>':''}</p>
+          </div>
+          <div class="result-card fix">
+            <h3>${isDead ? "Next time, watch for this" : "What to do now"}</h3>
+            <p>${s.fix}</p>
+          </div>
+          <div class="divider"></div>
+          <p class="muted">${name} actually needs: <strong>${p.lightRaw}</strong>, watered <strong>${p.waterRaw.toLowerCase()}</strong>.</p>
+        </div>
+      `;
+    };
+  };
+}
+
+function screenNewPlant(el){
+  el.innerHTML = `
+    <button class="back-link" id="back">← back</button>
+    <div class="eyebrow">Let's find your fit</div>
+    <h2>Tell us about your space and habits</h2>
+    <p>Be honest, not aspirational — this works best if you answer for your actual life.</p>
+    <div class="card">
+      <div class="slider-row">
+        <label>How much light does your space get?</label>
+        <div class="btn-group" id="lightGroup" data-value="2">
+          <button class="opt-btn" data-v="1">Low light</button>
+          <button class="opt-btn" data-v="2">Medium indirect</button>
+          <button class="opt-btn" data-v="3">Bright indirect</button>
+          <button class="opt-btn" data-v="4">Full sun</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <label>How often will you realistically water?</label>
+        <div class="btn-group" id="waterGroup" data-value="2">
+          <button class="opt-btn" data-v="1">Almost daily</button>
+          <button class="opt-btn" data-v="2">Weekly</button>
+          <button class="opt-btn" data-v="3">Every 1-2 weeks</button>
+          <button class="opt-btn" data-v="4">Rarely</button>
+        </div>
+      </div>
+      <p class="muted" style="margin-bottom:10px;">Your spot on the map is the blue diamond. The 4 gold-numbered dots are your closest matches — everything else fades into the background.</p>
+      <div id="mapHolder"></div>
+    </div>
+    <div id="matchWrap"></div>
+  `;
+  el.querySelector('#back').onclick = ()=> go(screenAsk);
+
+  const lightGroup = el.querySelector('#lightGroup');
+  const waterGroup = el.querySelector('#waterGroup');
+  const mapHolder = el.querySelector('#mapHolder');
+  const matchWrap = el.querySelector('#matchWrap');
+
+  function setActive(group, value){
+    group.dataset.value = value;
+    group.querySelectorAll('.opt-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.v === String(value));
+    });
+  }
+
+  function update(){
+    const light = parseInt(lightGroup.dataset.value), water = parseInt(waterGroup.dataset.value);
+    const userPoint = {light, water};
+    mapHolder.innerHTML = renderMapSVG({userPoint});
+    attachMapEvents(mapHolder);
+
+    const ranked = DATA.plants.map(p=>({...p, d: dist(userPoint,p)})).sort((a,b)=>a.d-b.d).slice(0,4);
+    matchWrap.innerHTML = `
+      <h3 style="margin-top:28px;">Your top 4 matches</h3>
+      <p class="muted" style="margin-top:-8px;">These are the same 4 plants numbered on the map above — closest to what you picked.</p>
+      <div class="match-list">
+        ${ranked.map((p,i)=>{
+          const imgQuery = encodeURIComponent(p.name.replace(/\(.*?\)/g,'').trim() + ' plant');
+          return `<div class="match-item">
+            <div style="width:26px;height:26px;border-radius:50%;background:#C68A1F;color:#FBF8EF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">${i+1}</div>
+            <img src="https://source.unsplash.com/120x90/?${imgQuery}" alt="${p.name}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+            <div style="flex:1;"><div class="name">${p.name}</div><div class="type">${p.type}</div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  el.querySelectorAll('#lightGroup .opt-btn').forEach(b=>{
+    b.onclick = ()=>{ setActive(lightGroup, b.dataset.v); update(); };
+  });
+  el.querySelectorAll('#waterGroup .opt-btn').forEach(b=>{
+    b.onclick = ()=>{ setActive(waterGroup, b.dataset.v); update(); };
+  });
+  setActive(lightGroup, 2);
+  setActive(waterGroup, 2);
+  update();
+}
+
+// ---------- START ----------
+go(screenStat);
+
+</script>
+</body>
+</html>
+
+<script>
+const DATA = {"plants": [{"name": "Money Plant (Pothos)", "botanical": "Epipremnum aureum", "type": "Foliage / Creeper", "lightRaw": "Low to bright indirect", "waterRaw": "Every 7-10 days (top 1-2 in dry)", "lightScore": 2, "waterScore": 2, "humidity": "Average, tolerates dry air", "feeding": "Monthly, growing season, half-strength", "difficulty": "Easy", "petSafe": "No - toxic (oxalates)", "growthHabit": "Trailing / climbing"}, {"name": "Snake Plant", "botanical": "Sansevieria trifasciata", "type": "Foliage / Succulent-like", "lightRaw": "Low to bright indirect", "waterRaw": "Every 2-3 weeks, let dry fully", "lightScore": 2, "waterScore": 4, "humidity": "Low, very tolerant", "feeding": "2x/year is enough", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright, sword-like"}, {"name": "ZZ Plant", "botanical": "Zamioculcas zamiifolia", "type": "Foliage", "lightRaw": "Low to bright indirect", "waterRaw": "Every 2-3 weeks, let dry fully", "lightScore": 2, "waterScore": 4, "humidity": "Low, tolerant of dry air", "feeding": "Monthly in growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright"}, {"name": "Spider Plant", "botanical": "Chlorophytum comosum", "type": "Foliage", "lightRaw": "Medium to bright indirect", "waterRaw": "Weekly (top inch dry)", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Trailing / arching"}, {"name": "Peace Lily", "botanical": "Spathiphyllum spp.", "type": "Flowering", "lightRaw": "Low to medium indirect", "waterRaw": "Weekly (top inch dry); droops when thirsty", "lightScore": 2, "waterScore": 2, "humidity": "High, likes humidity", "feeding": "Every 6-8 weeks", "difficulty": "Easy-Moderate", "petSafe": "No - toxic to pets", "growthHabit": "Upright, clumping"}, {"name": "Aglaonema (Chinese Evergreen)", "botanical": "Aglaonema commutatum", "type": "Foliage", "lightRaw": "Low to bright indirect", "waterRaw": "Every 7-14 days (top 1-2 in dry)", "lightScore": 2, "waterScore": 3, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright"}, {"name": "Dracaena", "botanical": "Dracaena spp.", "type": "Foliage", "lightRaw": "Low to bright indirect", "waterRaw": "Every 7-10 days (top 50-75% dry)", "lightScore": 2, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright cane"}, {"name": "Rubber Plant", "botanical": "Ficus elastica", "type": "Foliage", "lightRaw": "Bright indirect", "waterRaw": "Weekly (top 1-2 in dry)", "lightScore": 3, "waterScore": 2, "humidity": "Moderate-high", "feeding": "Monthly, growing season", "difficulty": "Easy-Moderate", "petSafe": "No - toxic (latex sap)", "growthHabit": "Upright tree-form"}, {"name": "Philodendron (Heartleaf)", "botanical": "Philodendron hederaceum", "type": "Foliage / Creeper", "lightRaw": "Medium to bright indirect", "waterRaw": "When top 3 cm dry", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Trailing / climbing"}, {"name": "Calathea", "botanical": "Calathea spp.", "type": "Foliage", "lightRaw": "Medium indirect, no direct sun", "waterRaw": "When top 2 in dry; use filtered water", "lightScore": 3, "waterScore": 2, "humidity": "High (60-80%)", "feeding": "Monthly, growing season", "difficulty": "Moderate-Tricky", "petSafe": "Yes - non-toxic", "growthHabit": "Upright, clumping"}, {"name": "Croton", "botanical": "Codiaeum variegatum", "type": "Foliage", "lightRaw": "Bright light (needs it for color)", "waterRaw": "When topsoil dry", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Moderate", "petSafe": "Caution - mildly toxic", "growthHabit": "Upright, bushy"}, {"name": "Schefflera (Umbrella Plant)", "botanical": "Schefflera arboricola", "type": "Foliage", "lightRaw": "Bright indirect", "waterRaw": "Weekly, regular", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright, bushy"}, {"name": "Boston Fern", "botanical": "Nephrolepis exaltata", "type": "Foliage", "lightRaw": "Indirect, no direct sun", "waterRaw": "Keep consistently moist", "lightScore": 3, "waterScore": 1, "humidity": "High - needs humidity", "feeding": "Monthly, growing season", "difficulty": "Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Arching fronds"}, {"name": "Areca Palm", "botanical": "Dypsis lutescens", "type": "Foliage", "lightRaw": "Bright indirect", "waterRaw": "When topsoil begins to dry", "lightScore": 3, "waterScore": 2, "humidity": "Moderate-high", "feeding": "Regular, growing season", "difficulty": "Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Upright, arching fronds"}, {"name": "Parlor Palm", "botanical": "Chamaedorea elegans", "type": "Foliage", "lightRaw": "Low to bright indirect", "waterRaw": "Weekly (top 1-2 in dry)", "lightScore": 2, "waterScore": 2, "humidity": "Moderate-high", "feeding": "1-2x/month, growing season", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Upright fronds"}, {"name": "Bird's Nest Fern", "botanical": "Asplenium nidus", "type": "Foliage", "lightRaw": "Medium to low indirect", "waterRaw": "Keep evenly moist", "lightScore": 2, "waterScore": 1, "humidity": "High", "feeding": "Monthly, growing season", "difficulty": "Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Rosette"}, {"name": "Prayer Plant (Maranta)", "botanical": "Maranta leuconeura", "type": "Foliage", "lightRaw": "Medium to bright indirect", "waterRaw": "Every 1-2 weeks (25% soil dry)", "lightScore": 3, "waterScore": 3, "humidity": "High", "feeding": "Monthly, growing season", "difficulty": "Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Trailing / clumping"}, {"name": "Cast Iron Plant", "botanical": "Aspidistra elatior", "type": "Foliage", "lightRaw": "Low light tolerant", "waterRaw": "Let dry between waterings", "lightScore": 1, "waterScore": 2, "humidity": "Low", "feeding": "Rarely needed", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Upright, clumping"}, {"name": "Peperomia", "botanical": "Peperomia spp.", "type": "Foliage", "lightRaw": "Medium indirect", "waterRaw": "When top 1-2 in dry", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Compact / trailing"}, {"name": "Jade Plant", "botanical": "Crassula ovata", "type": "Succulent", "lightRaw": "Bright light, some direct", "waterRaw": "Every 2-3 weeks, let dry fully", "lightScore": 3, "waterScore": 4, "humidity": "Low", "feeding": "2x/year", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright, branching"}, {"name": "Haworthia", "botanical": "Haworthia spp.", "type": "Succulent", "lightRaw": "Low to bright indirect (no harsh direct)", "waterRaw": "Every 2-3 weeks", "lightScore": 2, "waterScore": 4, "humidity": "Low", "feeding": "Rarely", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Rosette"}, {"name": "Echeveria", "botanical": "Echeveria spp.", "type": "Succulent", "lightRaw": "Bright / direct light", "waterRaw": "Every 2-3 weeks", "lightScore": 3, "waterScore": 4, "humidity": "Low", "feeding": "Rarely", "difficulty": "Moderate (light-demanding)", "petSafe": "Yes - non-toxic", "growthHabit": "Rosette"}, {"name": "Aloe Vera", "botanical": "Aloe barbadensis miller", "type": "Succulent", "lightRaw": "Bright indirect, some direct", "waterRaw": "Every 2-3 weeks", "lightScore": 3, "waterScore": 4, "humidity": "Low", "feeding": "2x/year", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Rosette"}, {"name": "Sedum", "botanical": "Sedum spp.", "type": "Succulent", "lightRaw": "Bright / direct light", "waterRaw": "Every 10-14 days", "lightScore": 3, "waterScore": 4, "humidity": "Low", "feeding": "Rarely", "difficulty": "Easy", "petSafe": "Caution - mildly toxic", "growthHabit": "Trailing / mounding"}, {"name": "Zebra Plant (Haworthia fasciata)", "botanical": "Haworthia fasciata", "type": "Succulent", "lightRaw": "Bright indirect", "waterRaw": "Every 2-3 weeks", "lightScore": 3, "waterScore": 4, "humidity": "Low", "feeding": "Rarely", "difficulty": "Easy", "petSafe": "Yes - non-toxic", "growthHabit": "Rosette"}, {"name": "String of Pearls", "botanical": "Senecio rowleyanus", "type": "Succulent / Trailing", "lightRaw": "Bright indirect", "waterRaw": "Every 2-3 weeks, careful not to overwater", "lightScore": 3, "waterScore": 4, "humidity": "Low", "feeding": "Occasional, growing season", "difficulty": "Moderate (easy to overwater)", "petSafe": "No - toxic to pets", "growthHabit": "Trailing"}, {"name": "Anthurium", "botanical": "Anthurium andraeanum", "type": "Flowering", "lightRaw": "Bright indirect", "waterRaw": "Weekly (top few cm dry)", "lightScore": 3, "waterScore": 2, "humidity": "High (50-60%+)", "feeding": "Monthly, growing season", "difficulty": "Moderate", "petSafe": "No - toxic to pets", "growthHabit": "Upright, clumping"}, {"name": "African Violet", "botanical": "Saintpaulia ionantha", "type": "Flowering", "lightRaw": "Bright indirect", "waterRaw": "When topsoil dry; bottom-water preferred", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Every 2 weeks, growing season", "difficulty": "Moderate (fussy about water on leaves)", "petSafe": "Yes - non-toxic", "growthHabit": "Rosette"}, {"name": "Kalanchoe", "botanical": "Kalanchoe blossfeldiana", "type": "Flowering / Succulent", "lightRaw": "Bright indirect, avoid direct", "waterRaw": "When soil is dry", "lightScore": 3, "waterScore": 2, "humidity": "Low", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Upright, clumping"}, {"name": "Hibiscus", "botanical": "Hibiscus rosa-sinensis", "type": "Flowering", "lightRaw": "Full sun", "waterRaw": "Regular, near-daily in summer heat", "lightScore": 4, "waterScore": 1, "humidity": "Moderate", "feeding": "Regular, growing season", "difficulty": "Moderate", "petSafe": "Yes - generally non-toxic", "growthHabit": "Shrub"}, {"name": "Orchid (Phalaenopsis)", "botanical": "Phalaenopsis spp.", "type": "Flowering", "lightRaw": "Bright indirect", "waterRaw": "Weekly, let dry between", "lightScore": 3, "waterScore": 2, "humidity": "High (50-70%)", "feeding": "Weekly-monthly, diluted", "difficulty": "Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Upright / epiphytic"}, {"name": "Adenium (Desert Rose)", "botanical": "Adenium obesum", "type": "Flowering / Succulent", "lightRaw": "Full sun (6-8 hrs)", "waterRaw": "Let dry out fully between waterings", "lightScore": 4, "waterScore": 2, "humidity": "Low", "feeding": "Regular, growing season, phosphorus-rich feed", "difficulty": "Moderate", "petSafe": "No - toxic (sap)", "growthHabit": "Thick trunk / shrub"}, {"name": "Bougainvillea", "botanical": "Bougainvillea spp.", "type": "Flowering / Creeper", "lightRaw": "Full sun", "waterRaw": "Moderate, let dry between", "lightScore": 4, "waterScore": 2, "humidity": "Low", "feeding": "Occasional, light feed", "difficulty": "Easy-Moderate", "petSafe": "Yes - non-toxic (thorny)", "growthHabit": "Vigorous climber"}, {"name": "Syngonium (Arrowhead Plant)", "botanical": "Syngonium podophyllum", "type": "Foliage / Creeper", "lightRaw": "Bright indirect", "waterRaw": "Weekly (top 2-3 cm dry)", "lightScore": 3, "waterScore": 2, "humidity": "Average", "feeding": "Monthly, growing season", "difficulty": "Easy", "petSafe": "No - toxic to pets", "growthHabit": "Climbing / trailing"}, {"name": "Hoya (Wax Plant)", "botanical": "Hoya carnosa", "type": "Foliage / Flowering creeper", "lightRaw": "Bright indirect", "waterRaw": "Let dry significantly between waterings", "lightScore": 3, "waterScore": 2, "humidity": "Moderate-high", "feeding": "Monthly, growing season", "difficulty": "Easy-Moderate", "petSafe": "Yes - non-toxic", "growthHabit": "Vining / trailing"}, {"name": "English Ivy", "botanical": "Hedera helix", "type": "Foliage / Creeper", "lightRaw": "Medium to bright indirect, prefers cool", "waterRaw": "Weekly (top inch dry)", "lightScore": 3, "waterScore": 2, "humidity": "Average-high", "feeding": "Monthly, growing season", "difficulty": "Moderate (struggles in heat)", "petSafe": "No - toxic to pets", "growthHabit": "Trailing / climbing"}, {"name": "Rangoon Creeper", "botanical": "Combretum indicum (syn. Quisqualis indica)", "type": "Flowering climber", "lightRaw": "Full sun to medium-bright", "waterRaw": "Moderate, let topsoil dry between", "lightScore": 4, "waterScore": 2, "humidity": "Moderate", "feeding": "Light feed, 2x/year", "difficulty": "Moderate", "petSafe": "Not well documented", "growthHabit": "Vigorous twining climber, needs support"}, {"name": "Morning Glory", "botanical": "Ipomoea spp.", "type": "Flowering climber", "lightRaw": "Full sun", "waterRaw": "Regular, moderate", "lightScore": 4, "waterScore": 2, "humidity": "Moderate", "feeding": "Minimal", "difficulty": "Easy", "petSafe": "Caution - seeds toxic if ingested", "growthHabit": "Fast twining climber"}, {"name": "Clock Vine (Bengal Clock Vine)", "botanical": "Thunbergia grandiflora", "type": "Flowering climber", "lightRaw": "Full sun to partial", "waterRaw": "Moderate, let dry between", "lightScore": 4, "waterScore": 2, "humidity": "Moderate", "feeding": "Minimal", "difficulty": "Easy", "petSafe": "Not well documented", "growthHabit": "Vigorous twining climber"}, {"name": "Betel Leaf Vine (Paan)", "botanical": "Piper betle", "type": "Foliage / Creeper", "lightRaw": "Partial shade / bright indirect", "waterRaw": "Keep moist, not waterlogged", "lightScore": 3, "waterScore": 1, "humidity": "High", "feeding": "Light, occasional", "difficulty": "Moderate", "petSafe": "Edible leaf - traditionally consumed", "growthHabit": "Climbing (needs moss pole/trellis)"}, {"name": "Passion Flower Vine", "botanical": "Passiflora spp.", "type": "Flowering climber", "lightRaw": "Full sun", "waterRaw": "Regular, moderate", "lightScore": 4, "waterScore": 2, "humidity": "Moderate", "feeding": "Regular, growing season", "difficulty": "Moderate", "petSafe": "Caution - some parts mildly toxic", "growthHabit": "Climbing tendrils"}, {"name": "Mint", "botanical": "Mentha spp.", "type": "Herb", "lightRaw": "Partial shade to bright indirect (3-4 hrs)", "waterRaw": "Keep soil consistently moist", "lightScore": 3, "waterScore": 1, "humidity": "Moderate", "feeding": "Occasional, light feed", "difficulty": "Easy", "petSafe": "Yes - edible, non-toxic", "growthHabit": "Spreading / bushy"}, {"name": "Tulsi (Holy Basil)", "botanical": "Ocimum sanctum / Ocimum tenuiflorum", "type": "Herb", "lightRaw": "Full sun (4-6 hrs)", "waterRaw": "Daily in summer, every 2 days in winter", "lightScore": 4, "waterScore": 1, "humidity": "Moderate", "feeding": "Occasional, light feed", "difficulty": "Easy", "petSafe": "Yes - edible, non-toxic", "growthHabit": "Upright, bushy"}, {"name": "Curry Leaf Plant", "botanical": "Murraya koenigii", "type": "Herb / Shrub", "lightRaw": "Full sun (6+ hrs)", "waterRaw": "When topsoil dry", "lightScore": 4, "waterScore": 2, "humidity": "Moderate", "feeding": "Light, regular feed", "difficulty": "Moderate (slow to establish, needs pruning)", "petSafe": "Yes - edible, non-toxic", "growthHabit": "Woody shrub"}], "komalOverlay": {"plant": "Bougainvillea", "ideal": {"lightScore": 4, "waterScore": 2, "label": "What it needed"}, "actual": {"lightScore": 1, "waterScore": 1, "label": "What Komal gave it (indoor room, watered daily)"}}, "symptoms": {"Money Plant (Pothos)": [{"symptom": "Lower leaves turn yellow, soil feels damp", "cause": "Overwatering / root rot risk", "fix": "Let soil dry out fully before next watering; check pot has drainage"}, {"symptom": "General yellowing across whole plant", "cause": "Too little light", "fix": "Move to a brighter (still indirect) spot"}, {"symptom": "Brown, crispy leaf tips", "cause": "Low humidity or dry air", "fix": "Mist occasionally or group with other plants"}, {"symptom": "Loss of variegation (leaves turning solid green)", "cause": "Insufficient light", "fix": "Move to a brighter spot"}], "Snake Plant": [{"symptom": "Soft, mushy leaf base, yellowing", "cause": "Overwatering / root rot", "fix": "Remove from pot, trim mushy roots, repot in dry fresh soil, water far less often"}, {"symptom": "Leaves wrinkling or curling", "cause": "Underwatering (rare)", "fix": "Water thoroughly, though this plant tolerates long dry spells"}], "ZZ Plant": [{"symptom": "Yellow, soft, mushy leaves; foul soil smell", "cause": "Overwatering / rhizome rot", "fix": "Remove from pot, trim black mushy roots, repot in fresh well-draining soil, reduce watering"}, {"symptom": "Leaning or stretching to one side", "cause": "Seeking more light", "fix": "Rotate pot weekly; move closer to a light source"}, {"symptom": "Bleached or scorched leaf patches", "cause": "Too much direct sun", "fix": "Move out of direct light"}], "Spider Plant": [{"symptom": "Brown leaf tips", "cause": "Fluoride/chlorine in tap water, or over-fertilizing", "fix": "Switch to filtered or rested tap water; reduce fertilizer"}, {"symptom": "Pale, faded leaves", "cause": "Too much direct, harsh sun", "fix": "Move to bright but indirect light"}, {"symptom": "No baby plantlets forming", "cause": "Plant too young, or under-stressed (not rootbound yet)", "fix": "Be patient - usually needs to mature and get slightly rootbound first"}], "Peace Lily": [{"symptom": "Whole plant droops dramatically", "cause": "Underwatering (thirsty)", "fix": "Water thoroughly - it recovers within hours"}, {"symptom": "Yellowing leaves", "cause": "Overwatering or too much direct light", "fix": "Check soil isn't soggy; move out of direct sun"}, {"symptom": "Brown leaf tips/edges", "cause": "Overwatering, over-fertilizing, or low humidity", "fix": "Reduce watering/feeding; increase humidity"}, {"symptom": "No flowers forming", "cause": "Insufficient light", "fix": "Move to a brighter (indirect) spot"}], "Aglaonema (Chinese Evergreen)": [{"symptom": "Yellowing lower leaves, soil constantly wet", "cause": "Overwatering", "fix": "Let soil dry more between waterings"}, {"symptom": "Brown, crispy leaf edges", "cause": "Underwatering or low humidity", "fix": "Water more consistently; raise humidity"}, {"symptom": "Leaves curling with dark patches", "cause": "Cold drafts / cold damage", "fix": "Move away from AC vents, windows, drafts"}, {"symptom": "Loss of red/pink color in colored varieties", "cause": "Insufficient light", "fix": "Move to brighter indirect light"}], "Dracaena": [{"symptom": "Brown leaf tips (common)", "cause": "Fluoride/salts in tap water, low humidity, or underwatering", "fix": "Switch to filtered/rested water; raise humidity"}, {"symptom": "Pale leaves, slow growth, small new leaves", "cause": "Insufficient light", "fix": "Move to brighter indirect light"}, {"symptom": "Yellowing leaves", "cause": "Overwatering, underwatering, low humidity, or nutrient deficiency", "fix": "Check soil moisture first, then adjust care accordingly"}], "Rubber Plant": [{"symptom": "Yellowing leaves, purple tinge, or brown edges", "cause": "Nutrient deficiency (nitrogen/phosphorus/potassium)", "fix": "Use a balanced water-soluble fertilizer during growing season"}, {"symptom": "Leaf drop", "cause": "Improper watering, insufficient light, or cold", "fix": "Check watering routine and move to warmer, brighter spot"}, {"symptom": "Brown spots on leaves", "cause": "Too much direct sun (sun damage)", "fix": "Move to bright, indirect light"}], "Philodendron (Heartleaf)": [{"symptom": "Yellowing leaves", "cause": "Overwatering", "fix": "Let top 3cm of soil dry before watering again"}, {"symptom": "Leggy growth with sparse leaves", "cause": "Insufficient light", "fix": "Move to brighter indirect spot"}], "Calathea": [{"symptom": "Curling, browning, or yellowing leaves", "cause": "Tap water sensitivity (fluoride/chlorine), low humidity, or inconsistent watering", "fix": "Use filtered/rested water; raise humidity; keep watering consistent"}], "Boston Fern": [{"symptom": "Fronds drying and dropping", "cause": "Low humidity", "fix": "Increase humidity - place near bathroom/kitchen or use a pebble tray"}, {"symptom": "Fronds yellowing, soil soggy", "cause": "Overwatering", "fix": "Allow slight drying between waterings; ensure drainage"}], "Areca Palm": [{"symptom": "Yellowish-green leaf color", "cause": "Too much direct sunlight", "fix": "Move to bright indirect light"}, {"symptom": "Wilting, drooping fronds", "cause": "Underwatering or insufficient light", "fix": "Check soil moisture and light levels"}, {"symptom": "Crisping frond tips, especially in winter", "cause": "Low humidity", "fix": "Mist regularly or use a humidifier"}], "Parlor Palm": [{"symptom": "Faded, silvery, speckled leaves with fine webbing", "cause": "Spider mites (common in dry air)", "fix": "Isolate plant; wipe leaves; treat with insecticidal soap"}, {"symptom": "Inner fronds yellow despite plant looking healthy", "cause": "Stale air / lack of air circulation", "fix": "Improve airflow, rotate plant occasionally"}], "Prayer Plant (Maranta)": [{"symptom": "Leaves fading or losing vibrant color", "cause": "Too much direct light", "fix": "Move to medium/low-bright indirect light, away from direct sun"}, {"symptom": "Leaves stop their evening 'praying' movement", "cause": "General stress - check watering, light, temperature", "fix": "Review overall care routine; this is often the first sign something is off"}], "Jade Plant": [{"symptom": "Leggy, stretched growth", "cause": "Insufficient light", "fix": "Move to a sunnier spot"}, {"symptom": "Wrinkled, thin leaves", "cause": "Underwatering", "fix": "Water thoroughly, then let dry before next watering"}, {"symptom": "Mushy, translucent leaves", "cause": "Overwatering", "fix": "Let soil dry out completely; check drainage"}], "Aloe Vera": [{"symptom": "Brown leaf tips", "cause": "Underwatering (insufficient water)", "fix": "Water more generously, then let dry before next watering"}, {"symptom": "Leaves turning brown / mushy at base", "cause": "Overwatering", "fix": "Reduce frequency; ensure well-draining soil and pot"}], "Anthurium": [{"symptom": "Brown tips or edges on leaves", "cause": "Dry air or inconsistent watering", "fix": "Increase humidity; keep watering schedule consistent"}, {"symptom": "Drooping leaves", "cause": "Thirst, cold drafts, or shock from repotting", "fix": "Check soil moisture and move away from drafts"}, {"symptom": "Not flowering", "cause": "Insufficient light or lack of nutrients", "fix": "Move to brighter indirect light; fertilize during growing season"}], "African Violet": [{"symptom": "Damage or overwatering symptoms", "cause": "Watering on leaves or excess water", "fix": "Water from below (bottom-water); avoid wetting leaves"}], "Orchid (Phalaenopsis)": [{"symptom": "Wilting or wrinkling leaves", "cause": "Underwatering", "fix": "Water thoroughly, ensure medium isn't bone dry for long"}, {"symptom": "Yellowing leaves", "cause": "Overwatering or too much direct sunlight", "fix": "Adjust watering schedule; relocate if needed"}, {"symptom": "Flowers wilting after a long bloom", "cause": "Natural end of bloom cycle", "fix": "Normal - plant is storing energy to rebloom later"}], "Adenium (Desert Rose)": [{"symptom": "Soft stems, drying leaf tips", "cause": "Overwatering (most common cause)", "fix": "Let soil dry completely before watering again; use gritty, fast-draining mix"}, {"symptom": "Yellow leaves in summer", "cause": "Overwatering, root rot, or nutrient deficiency", "fix": "Ensure good drainage; reduce watering; consider balanced fertilizer"}], "Syngonium (Arrowhead Plant)": [{"symptom": "Yellowing leaves", "cause": "Overwatering or poor drainage", "fix": "Let soil dry between waterings; check drainage"}, {"symptom": "Crispy leaf edges", "cause": "Low humidity or inconsistent watering", "fix": "Increase humidity; keep watering consistent"}, {"symptom": "Leggy growth, fading color", "cause": "Insufficient light", "fix": "Move to brighter indirect light"}], "Hoya (Wax Plant)": [{"symptom": "Yellowing leaves", "cause": "Overwatering (most common cause)", "fix": "Let soil dry out substantially between waterings"}, {"symptom": "Wrinkled, shriveled, soft leaves", "cause": "Underwatering", "fix": "Water thoroughly; leaves store moisture so this is less common"}, {"symptom": "Dropped flower buds", "cause": "Soil too dry/wet, or sudden temperature change", "fix": "Keep consistent care; avoid moving plant while budding"}], "Tulsi (Holy Basil)": [{"symptom": "Yellowing leaves, leaf drop", "cause": "Overwatering, low light, or root rot", "fix": "Check drainage first; ensure 4-6 hrs direct sun"}, {"symptom": "Dark, water-soaked spots", "cause": "Bacterial leaf spot (Pseudomonas)", "fix": "Remove affected leaves; avoid splashing water on foliage"}, {"symptom": "Purple spots on leaves", "cause": "Too much intense sun", "fix": "Provide some afternoon shade in peak summer"}], "Curry Leaf Plant": [{"symptom": "Slow growth after planting", "cause": "Normal establishment period, or insufficient sun", "fix": "Be patient; ensure 6+ hours of direct sun"}, {"symptom": "Leggy, sparse growth", "cause": "Lack of pruning", "fix": "Prune back by about half every 3 months"}], "Bougainvillea": [{"symptom": "Leaves yellowing and shedding one by one", "cause": "Kept in low light indoors when it needs full, direct sun to thrive, likely compounded by watering too often for a plant that prefers to dry out between waterings", "fix": "Move to the sunniest spot available (a bright balcony or terrace, not indoors) and let soil dry out between waterings"}, {"symptom": "Few or no flowers", "cause": "Insufficient direct sunlight", "fix": "Needs 5-6+ hours of direct sun daily to bloom well"}]}, "scaleLabels": {"light": {"1": "Low light", "2": "Medium indirect", "3": "Bright indirect", "4": "Full sun"}, "water": {"1": "Daily / frequent", "2": "Weekly", "3": "Every 1-2 weeks", "4": "Every 2-3+ weeks"}}};
+</script>
+<script>
+const app = document.getElementById('app');
+
+// ---------- MAP GEOMETRY ----------
+const PAD = 54, W = 640, H = 460;
+const plotW = W - PAD*2, plotH = H - PAD*2;
+function sx(light){ return PAD + (light-0.5)/4 * plotW; }
+function sy(water){ return PAD + (water-0.5)/4 * plotH; } // water=1 (frequent) top, water=4 (rare) bottom
+
+const lightLabels = {1:'Low light',2:'Medium indirect',3:'Bright indirect',4:'Full sun'};
+const waterLabels = {1:'Waters often',2:'Weekly',3:'Every 1-2 wks',4:'Rarely'};
+
+function dist(user, plant){
+  return Math.sqrt(Math.pow(user.light-plant.lightScore,2) + Math.pow(user.water-plant.waterScore,2));
+}
+
+// ---------- MAP RENDERER ----------
+// opts: { highlightName, komal:bool, userPoint:{light,water}|null, dimOthers:bool }
+function renderMapSVG(opts={}){
+  const plants = DATA.plants;
+  let dots = '';
+  let labels = '';
+  let topFour = [];
+
+  if(opts.userPoint){
+    topFour = plants.map(p=>({...p, d: dist(opts.userPoint,p)})).sort((a,b)=>a.d-b.d).slice(0,4);
+  }
+  const topNames = new Set(topFour.map(p=>p.name));
+
+  plants.forEach(p=>{
+    const cx = sx(p.lightScore), cy = sy(p.waterScore);
+    let r = 6, fill = '#9C9268', opacity = 0.6;
+
+    if(opts.highlightName && p.name === opts.highlightName){
+      r = 10; fill = '#2F5233'; opacity = 1;
+    } else if(opts.highlightName){
+      opacity = 0.2;
+    }
+
+    if(opts.userPoint){
+      if(topNames.has(p.name)){
+        r = 10; fill = '#6B9E4A'; opacity = 1;
+      } else {
+        r = 4; fill = '#C9BE9D'; opacity = 0.5;
+      }
+    }
+
+    dots += `<circle class="dot" data-name="${p.name.replace(/"/g,'&quot;')}" cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" opacity="${opacity}" stroke="#FBF8EF" stroke-width="1.5"></circle>`;
+  });
+
+  if(opts.userPoint){
+    topFour.forEach((p,i)=>{
+      const cx = sx(p.lightScore), cy = sy(p.waterScore);
+      labels += `<circle cx="${cx}" cy="${cy-19}" r="9" fill="#C68A1F"/>
+        <text x="${cx}" y="${cy-15}" fill="#FBF8EF" font-size="11" text-anchor="middle" font-weight="700">${i+1}</text>`;
+    });
+  }
+
+  let komalLayer = '';
+  if(opts.komal){
+    const ideal = DATA.komalOverlay.ideal, actual = DATA.komalOverlay.actual;
+    const ix = sx(ideal.lightScore), iy = sy(ideal.waterScore);
+    const ax = sx(actual.lightScore), ay = sy(actual.waterScore);
+    komalLayer = `
+      <line x1="${ax}" y1="${ay}" x2="${ix}" y2="${iy}" stroke="#B04A3A" stroke-width="2.5" stroke-dasharray="6,5" marker-end="url(#arrow)"/>
+      <circle cx="${ax}" cy="${ay}" r="10" fill="#B04A3A" stroke="#FBF8EF" stroke-width="2"/>
+      <circle cx="${ix}" cy="${iy}" r="10" fill="#6B9E4A" stroke="#FBF8EF" stroke-width="2"/>
+      <text x="${ax}" y="${ay+26}" fill="#B04A3A" font-size="12" text-anchor="middle" font-weight="600">What Komal gave it</text>
+      <text x="${ix}" y="${iy-16}" fill="#3F6B2C" font-size="12" text-anchor="middle" font-weight="600">What it needed</text>
+    `;
+  }
+
+  let userLayer = '';
+  if(opts.userPoint){
+    const ux = sx(opts.userPoint.light), uy = sy(opts.userPoint.water);
+    let userText = `<text x="${ux}" y="${uy-18}" fill="#3E7C8C" font-size="12" text-anchor="middle" font-weight="600">You</text>`;
+    userLayer = `<path d="M${ux} ${uy-11} L${ux+11} ${uy} L${ux} ${uy+11} L${ux-11} ${uy} Z" fill="#3E7C8C" stroke="#FBF8EF" stroke-width="1.5"/>` + userText;
+  }
+
+  return `
+  <div style="position:relative;">
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:#FBF8EF;border-radius:14px;border:1.5px solid #C9BE9D;">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#B04A3A"/>
+        </marker>
+      </defs>
+      <!-- axes -->
+      <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="#C9BE9D"/>
+      <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="#C9BE9D"/>
+      ${[1,2,3,4].map(v=>`<text x="${sx(v)}" y="${H-PAD+20}" fill="#6B664F" font-size="11" text-anchor="middle">${lightLabels[v]}</text>`).join('')}
+      ${[1,2,3,4].map(v=>`<text x="${PAD-8}" y="${sy(v)+4}" fill="#6B664F" font-size="11" text-anchor="end">${waterLabels[v]}</text>`).join('')}
+      <text x="${W/2}" y="${H-8}" fill="#B5651D" font-size="12" text-anchor="middle" font-weight="600">LIGHT NEEDED →</text>
+      <text x="14" y="${H/2}" fill="#B5651D" font-size="12" text-anchor="middle" font-weight="600" transform="rotate(-90 14 ${H/2})">WATERING NEED →</text>
+      ${dots}
+      ${labels}
+      ${komalLayer}
+      ${userLayer}
+    </svg>
+    <div id="tooltip" style="display:none;position:absolute;"></div>
+  </div>`;
+}
+
+function attachMapEvents(container){
+  const svg = container.querySelector('svg');
+  const tooltip = container.querySelector('#tooltip');
+  container.querySelectorAll('.dot').forEach(dot=>{
+    dot.addEventListener('mousemove', (e)=>{
+      const rect = container.getBoundingClientRect();
+      tooltip.style.display = 'block';
+      tooltip.className = 'tooltip';
+      tooltip.style.left = (e.clientX - rect.left + 14) + 'px';
+      tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+      tooltip.textContent = dot.getAttribute('data-name');
+    });
+    dot.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+  });
+}
+
+// ---------- SCREENS ----------
+function go(renderFn){
+  setStoryMode(false);
+  app.innerHTML = '';
+  const el = document.createElement('div');
+  el.className = 'fade-in';
+  app.appendChild(el);
+  renderFn(el);
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+function screenStat(el){
+  el.innerHTML = `
+    <div class="eyebrow">She's not alone</div>
+    <h2>This happens to almost everyone</h2>
+    <p class="muted">From a 2022 survey of 1,250 young plant owners (Trees.com / Pollfish):</p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num">69%</div>
+        <div class="lbl">of plant owners aged 18-24 have had at least one houseplant die on them</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:0%" id="bar1"></div></div>
+      </div>
+      <div class="stat">
+        <div class="num">1 in 10</div>
+        <div class="lbl">have lost ten or more plants</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:0%" id="bar2"></div></div>
+      </div>
+    </div>
+    <p>So Komal didn't do anything careless. She just didn't know what her specific plant actually needed — and there was no easy way to find out.</p>
+    <button class="btn" id="next">See what actually went wrong →</button>
+  `;
+  requestAnimationFrame(()=>{
+    document.getElementById('bar1').style.width = '69%';
+    document.getElementById('bar2').style.width = '10%';
+  });
+  el.querySelector('#next').onclick = ()=> go(screenMapReveal);
+}
+
+function screenMapReveal(el){
+  el.innerHTML = `
+    <div class="eyebrow">The Mismatch Map</div>
+    <h2>Every plant needs a certain amount of light and water</h2>
+    <p>Here are 44 common beginner plants, placed by what they actually need — how much light, and how often they want water. Plants that love full sun and barely any water sit in one corner. Plants that are happy in shade but thirsty often sit in another.</p>
+    <div class="card">${renderMapSVG({komal:true})}</div>
+    <p>A bougainvillea sits far on the "full sun, water rarely" side. But Komal kept hers in a low-light room and watered it daily — the opposite corner of the map.</p>
+    <p><strong>That gap between the two points is why it died.</strong> Not carelessness — a mismatch.</p>
+    <button class="btn" id="next">What about your plant? →</button>
+  `;
+  attachMapEvents(el.querySelector('.card'));
+  el.querySelector('#next').onclick = ()=> go(screenAsk);
+}
+
+function screenAsk(el){
+  el.innerHTML = `
+    <div class="eyebrow">Your turn</div>
+    <h2>What about you?</h2>
+    <p>Pick whichever fits where you are right now.</p>
+    <div class="choice-grid">
+      <button class="choice-btn" id="c1"><span class="icon">🌱</span><span class="label">My plant is struggling</span><div class="muted" style="margin-top:6px;">Something looks off, but it's still alive</div></button>
+      <button class="choice-btn" id="c2"><span class="icon">🥀</span><span class="label">My plant already died</span><div class="muted" style="margin-top:6px;">Let's understand why, for next time</div></button>
+      <button class="choice-btn" id="c3"><span class="icon">🪴</span><span class="label">I want a new plant</span><div class="muted" style="margin-top:6px;">Let's find one that'll actually fit you</div></button>
+    </div>
+  `;
+  el.querySelector('#c1').onclick = ()=> go((e)=>screenDiagnose(e,'struggling'));
+  el.querySelector('#c2').onclick = ()=> go((e)=>screenDiagnose(e,'died'));
+  el.querySelector('#c3').onclick = ()=> go(screenNewPlant);
+}
+
+function screenDiagnose(el, mode){
+  const isDead = mode === 'died';
+  const plantNames = DATA.plants.map(p=>p.name).sort();
+  el.innerHTML = `
+    <button class="back-link" id="back">← back</button>
+    <div class="eyebrow">${isDead ? "Let's find out what happened" : "Let's fix this"}</div>
+    <h2>${isDead ? "Which plant did you lose?" : "Which plant is struggling?"}</h2>
+    <label>Plant</label>
+    <select id="plantSelect">
+      <option value="">Choose a plant…</option>
+      ${plantNames.map(n=>`<option value="${n}">${n}</option>`).join('')}
+    </select>
+    <div id="symptomWrap" style="display:none;">
+      <label>What are you seeing${isDead ? ' (before it died)':''}?</label>
+      <select id="symptomSelect"></select>
+    </div>
+    <div id="mapHolder"></div>
+    <div id="resultWrap"></div>
+  `;
+  el.querySelector('#back').onclick = ()=> go(screenAsk);
+
+  const plantSelect = el.querySelector('#plantSelect');
+  const symptomWrap = el.querySelector('#symptomWrap');
+  const symptomSelect = el.querySelector('#symptomSelect');
+  const mapHolder = el.querySelector('#mapHolder');
+  const resultWrap = el.querySelector('#resultWrap');
+
+  plantSelect.onchange = ()=>{
+    const name = plantSelect.value;
+    resultWrap.innerHTML = '';
+    if(!name){ symptomWrap.style.display='none'; mapHolder.innerHTML=''; return; }
+
+    mapHolder.innerHTML = `<div class="card">${renderMapSVG({highlightName:name})}</div>`;
+    attachMapEvents(mapHolder.querySelector('.card'));
+
+    let syms = DATA.symptoms[name];
+    let generic = false;
+    if(!syms){
+      generic = true;
+      syms = [
+        {symptom:'Yellow leaves, soil feels damp', cause:'Overwatering / root rot risk', fix:'Let soil dry out fully before watering again; check the pot drains well'},
+        {symptom:'Brown, crispy leaf edges', cause:'Underwatering or low humidity', fix:'Water more consistently, or raise humidity around the plant'},
+        {symptom:'Leggy growth, stretching to one side', cause:'Insufficient light', fix:'Move to a brighter spot and rotate the pot occasionally'},
+        {symptom:'Sudden leaf drop', cause:'Shock from repotting, cold drafts, or a big change in environment', fix:'Keep conditions stable; avoid moving it right after repotting'}
+      ];
+    }
+    symptomWrap.style.display = 'block';
+    symptomSelect.innerHTML = `<option value="">Choose a symptom…</option>` +
+      syms.map((s,i)=>`<option value="${i}">${s.symptom}</option>`).join('');
+
+    symptomSelect.onchange = ()=>{
+      const idx = symptomSelect.value;
+      if(idx===''){ resultWrap.innerHTML=''; return; }
+      const s = syms[idx];
+      const p = DATA.plants.find(p=>p.name===name);
+      resultWrap.innerHTML = `
+        <div class="card">
+          <div class="result-card">
+            <h3>${isDead ? "What likely happened" : "What's likely going on"}</h3>
+            <p>${s.cause}${generic ? ' <span class="muted">(general guidance — this plant\u2019s specific symptoms were not individually verified)</span>':''}</p>
+          </div>
+          <div class="result-card fix">
+            <h3>${isDead ? "Next time, watch for this" : "What to do now"}</h3>
+            <p>${s.fix}</p>
+          </div>
+          <div class="divider"></div>
+          <p class="muted">${name} actually needs: <strong>${p.lightRaw}</strong>, watered <strong>${p.waterRaw.toLowerCase()}</strong>.</p>
+        </div>
+      `;
+    };
+  };
+}
+
+function screenNewPlant(el){
+  el.innerHTML = `
+    <button class="back-link" id="back">← back</button>
+    <div class="eyebrow">Let's find your fit</div>
+    <h2>Tell us about your space and habits</h2>
+    <p>Be honest, not aspirational — this works best if you answer for your actual life.</p>
+    <div class="card">
+      <div class="slider-row">
+        <label>How much light does your space get?</label>
+        <div class="btn-group" id="lightGroup" data-value="2">
+          <button class="opt-btn" data-v="1">Low light</button>
+          <button class="opt-btn" data-v="2">Medium indirect</button>
+          <button class="opt-btn" data-v="3">Bright indirect</button>
+          <button class="opt-btn" data-v="4">Full sun</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <label>How often will you realistically water?</label>
+        <div class="btn-group" id="waterGroup" data-value="2">
+          <button class="opt-btn" data-v="1">Almost daily</button>
+          <button class="opt-btn" data-v="2">Weekly</button>
+          <button class="opt-btn" data-v="3">Every 1-2 weeks</button>
+          <button class="opt-btn" data-v="4">Rarely</button>
+        </div>
+      </div>
+      <p class="muted" style="margin-bottom:10px;">Your spot on the map is the blue diamond. The 4 gold-numbered dots are your closest matches — everything else fades into the background.</p>
+      <div id="mapHolder"></div>
+    </div>
+    <div id="matchWrap"></div>
+  `;
+  el.querySelector('#back').onclick = ()=> go(screenAsk);
+
+  const lightGroup = el.querySelector('#lightGroup');
+  const waterGroup = el.querySelector('#waterGroup');
+  const mapHolder = el.querySelector('#mapHolder');
+  const matchWrap = el.querySelector('#matchWrap');
+
+  function setActive(group, value){
+    group.dataset.value = value;
+    group.querySelectorAll('.opt-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.v === String(value));
+    });
+  }
+
+  function update(){
+    const light = parseInt(lightGroup.dataset.value), water = parseInt(waterGroup.dataset.value);
+    const userPoint = {light, water};
+    mapHolder.innerHTML = renderMapSVG({userPoint});
+    attachMapEvents(mapHolder);
+
+    const ranked = DATA.plants.map(p=>({...p, d: dist(userPoint,p)})).sort((a,b)=>a.d-b.d).slice(0,4);
+    matchWrap.innerHTML = `
+      <h3 style="margin-top:28px;">Your top 4 matches</h3>
+      <p class="muted" style="margin-top:-8px;">These are the same 4 plants numbered on the map above — closest to what you picked.</p>
+      <div class="match-list">
+        ${ranked.map((p,i)=>{
+          const imgQuery = encodeURIComponent(p.name.replace(/\(.*?\)/g,'').trim() + ' plant');
+          return `<div class="match-item">
+            <div style="width:26px;height:26px;border-radius:50%;background:#C68A1F;color:#FBF8EF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">${i+1}</div>
+            <img src="https://source.unsplash.com/120x90/?${imgQuery}" alt="${p.name}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+            <div style="flex:1;"><div class="name">${p.name}</div><div class="type">${p.type}</div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  el.querySelectorAll('#lightGroup .opt-btn').forEach(b=>{
+    b.onclick = ()=>{ setActive(lightGroup, b.dataset.v); update(); };
+  });
+  el.querySelectorAll('#waterGroup .opt-btn').forEach(b=>{
+    b.onclick = ()=>{ setActive(waterGroup, b.dataset.v); update(); };
+  });
+  setActive(lightGroup, 2);
+  setActive(waterGroup, 2);
+  update();
+}
+
+// ---------- START ----------
+go(screenStory);
+
+</script>
+</body>
+</html>
